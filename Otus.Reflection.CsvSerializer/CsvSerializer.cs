@@ -26,7 +26,7 @@ namespace Otus.Reflection.CsvSerializer
 
             return csv.ToString();
         }
-        
+
         private static string FieldsToCsv(FieldInfo[] fieldInfos, object obj, string separator)
         {
             var csv = new StringBuilder();
@@ -66,9 +66,43 @@ namespace Otus.Reflection.CsvSerializer
         /// <summary>
         /// Десериализация csv строки в объект
         /// </summary>
-        public static void Deserialize()
+        /// <param name="csv">Csv строка</param>
+        /// <param name="separator">Разделитель</param>
+        public static T Deserialize<T>(string csv, string separator) where T : class, new()
         {
-            throw new NotImplementedException();
+            var scvStrings = csv.Split("\r\n");
+            if (scvStrings.Length == 0) throw new InvalidOperationException("Sequence CSV contains no elements");
+
+            var newObj = new T();
+            var type = newObj.GetType();
+
+            const BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+
+            var fields = scvStrings[0].Split(separator);
+            foreach (var field in fields)
+            {
+                var fieldName = field.Split(':')[0];
+                var fieldValue = field.Split(':')[1];
+
+                var fieldInfo = type.GetField(fieldName, bindingFlags);
+                var fieldType = fieldInfo?.FieldType;
+
+                fieldInfo?.SetValue(newObj, Convert.ChangeType(fieldValue, fieldType));
+            }
+
+            var properties = scvStrings[1].Split(separator);
+            foreach (var property in properties)
+            {
+                var propertyName = property.Split(':')[0];
+                var propertyValue = property.Split(':')[1];
+
+                var propertyInfo = type.GetField(propertyName, bindingFlags);
+                var propertyType = propertyInfo?.FieldType;
+
+                propertyInfo?.SetValue(newObj, Convert.ChangeType(propertyValue, propertyType));
+            }
+
+            return newObj;
         }
     }
 }
