@@ -34,7 +34,7 @@ namespace Otus.Reflcetion.Application
             stopwatch.Start();
 
             result = string.Empty;
-            for (var i = 0; i < 9999; i++)
+            for (var i = 0; i < 10000; i++)
             {
                 result = CsvSerializer.Serialize(data, Separator);
             }
@@ -48,7 +48,7 @@ namespace Otus.Reflcetion.Application
             stopwatch.Start();
 
             resultDeserialize = string.Empty;
-            for (var i = 0; i < 9999; i++)
+            for (var i = 0; i < 10000; i++)
             {
                 resultDeserialize = CsvSerializer.Deserialize<F>(csv, Separator);
             }
